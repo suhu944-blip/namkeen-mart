@@ -1,16 +1,27 @@
 # Namkeen Mart - Full-Stack E-Commerce Platform
 
-A modern, scalable MERN-stack e-commerce web application for authentic Indian savory snacks (namkeen). The application features two decoupled portals:
-- **User Side**: Storefront for customers to browse, filter, and buy snacks.
-- **Admin Panel**: Operational dashboard for inventory, orders, and customer management.
+A modern, full-stack MERN e-commerce web application for authentic Indian savory snacks (namkeen). The application features two decoupled portals:
+- **Customer Storefront**: Browse categories, filter/search snacks, view details, register and log in.
+- **Admin Management Panel**: Dashboard analytics, product CRUD, category CRUD with assignment protection, and inventory visibility.
 
 ---
 
 ## 🛠️ Technology Stack
 
-- **Frontend**: React 19, Vite, Tailwind CSS, React Router DOM, Axios, Lucide React
-- **Backend**: Node.js, Express.js, MongoDB, Mongoose, Dotenv, CORS
-- **Architecture**: Decoupled Client-Server with ES Modules (`import`/`export`)
+- **Frontend**: React 19 (`.jsx`), Vite, Tailwind CSS v4, React Router DOM v7, Axios, Lucide React, Context API (`AuthContext`)
+- **Backend**: Node.js, Express.js (`.js`), MongoDB, Mongoose, JWT Authentication, bcryptjs, Dotenv, CORS
+- **Architecture**: Strict MVC (`React → API Route → Controller → Service → Model → MongoDB`) with ES Modules (`import`/`export`)
+
+---
+
+## 🔑 Demo Credentials
+
+| Role | Email | Password | Access Portal |
+| :--- | :--- | :--- | :--- |
+| **Store Administrator** | `admin@namkeenmart.com` | `AdminPassword123!` | `/admin/login` |
+| **Demo Customer** | `customer@namkeenmart.com` | `Customer123!` | `/login` |
+
+*(A convenient **"Auto-Fill"** button is also available on both login pages for rapid evaluation!)*
 
 ---
 
@@ -18,18 +29,37 @@ A modern, scalable MERN-stack e-commerce web application for authentic Indian sa
 
 ```text
 namkeen-mart-app/
-├── client/          # Frontend React + Vite application
+├── client/
 │   ├── public/
 │   ├── src/
 │   │   ├── assets/
 │   │   ├── components/
+│   │   │   ├── Navbar.jsx           # Sticky nav, brand, search, cart placeholder & auth
+│   │   │   ├── Footer.jsx           # Heritage story, quick links & contact
+│   │   │   ├── ProductCard.jsx      # Snack card with pricing, badges & quick view
+│   │   │   └── CategoryCard.jsx     # Curated category cards with image zoom
 │   │   ├── context/
-│   │   ├── hooks/
+│   │   │   └── AuthContext.jsx      # Global auth state, JWT storage & user roles
 │   │   ├── layouts/
+│   │   │   ├── MainLayout.jsx       # Customer portal shell
+│   │   │   └── AdminLayout.jsx      # Admin sidebar & topbar navigation shell
 │   │   ├── pages/
+│   │   │   ├── Home.jsx             # Hero, dynamic categories, featured & about sections
+│   │   │   ├── Products.jsx         # Full catalog with search, category & sort filters
+│   │   │   ├── Login.jsx            # Customer sign in with validation
+│   │   │   ├── Register.jsx         # Customer registration with validation
+│   │   │   └── admin/
+│   │   │       ├── AdminLogin.jsx       # Dedicated admin entrance with security guard
+│   │   │       ├── Dashboard.jsx        # Live statistics & quick actions
+│   │   │       ├── ManageProducts.jsx   # Product CRUD with live status & featured toggles
+│   │   │       └── ManageCategories.jsx # Category CRUD with product assignment safety check
 │   │   ├── routes/
+│   │   │   └── AppRoutes.jsx        # Customer & protected admin route definitions
 │   │   ├── services/
-│   │   ├── utils/
+│   │   │   ├── api.js               # Axios instance with JWT interceptor
+│   │   │   ├── authService.js       # Customer & Admin auth endpoints
+│   │   │   ├── productService.js    # Product catalog endpoints
+│   │   │   └── categoryService.js   # Category management endpoints
 │   │   ├── App.jsx
 │   │   ├── main.jsx
 │   │   └── index.css
@@ -37,20 +67,41 @@ namkeen-mart-app/
 │   ├── package.json
 │   └── vite.config.js
 │
-├── server/          # Backend Express.js REST API
+├── server/
 │   ├── config/
-│   ├── controllers/
+│   │   └── db.js                # Mongoose connection with fallback safety
+│   ├── controllers/             # HTTP request/response handlers
+│   │   ├── authController.js
+│   │   ├── categoryController.js
+│   │   ├── productController.js
+│   │   └── adminController.js
 │   ├── middleware/
-│   ├── models/
-│   ├── routes/
-│   ├── services/
+│   │   ├── authMiddleware.js    # JWT verification & admin role check
+│   │   └── errorMiddleware.js   # 404 & global error formatter
+│   ├── models/                  # Mongoose data schemas
+│   │   ├── User.js              # Name, email, mobile, password, role, isActive
+│   │   ├── Category.js          # Name, description, image, isActive
+│   │   └── Product.js           # Name, description, category, price, stock, isFeatured
+│   ├── routes/                  # Express REST routes
+│   │   ├── authRoutes.js
+│   │   ├── categoryRoutes.js
+│   │   ├── productRoutes.js
+│   │   ├── adminRoutes.js
+│   │   └── health.routes.js
+│   ├── services/                # Business logic & database operations
+│   │   ├── authService.js
+│   │   ├── categoryService.js
+│   │   ├── productService.js
+│   │   ├── adminService.js
+│   │   └── mockStore.js         # Zero-config initial seed & fallback store
 │   ├── utils/
-│   ├── app.js
-│   ├── server.js
+│   │   └── seed.js              # Standalone / startup seed script
+│   ├── app.js                   # Express pipeline & CORS config
+│   ├── server.js                # HTTP listener
 │   ├── .env.example
 │   └── package.json
 │
-├── docs/            # Architecture & specifications
+├── docs/
 │   ├── PROJECT_OVERVIEW.md
 │   ├── TECHNOLOGY_STACK.md
 │   └── FOLDER_STRUCTURE.md
@@ -63,93 +114,65 @@ namkeen-mart-app/
 
 ## 🚀 Quick Start Guide
 
-### Prerequisites
-- [Node.js](https://nodejs.org/) (v18 or higher recommended; v24 tested)
-- [MongoDB](https://www.mongodb.com/) (Local instance or MongoDB Atlas cluster URI)
-- [npm](https://www.npmjs.com/) (v9 or higher)
-
----
-
-### 1. Server Setup
-
-Navigate to the `server/` directory:
+### 1. Backend (Server)
 
 ```bash
 cd server
-```
-
-Copy the environment file:
-```bash
-cp .env.example .env
-```
-*(On Windows PowerShell: `Copy-Item .env.example .env`)*
-
-Install backend dependencies:
-```bash
 npm install
-```
-
-Start the development server:
-```bash
 npm run dev
 ```
 
-The server will start at `http://localhost:5000`.  
-Verify health check: [http://localhost:5000/api/health](http://localhost:5000/api/health)
+- Server URL: `http://localhost:5000`
+- Health check: [http://localhost:5000/api/health](http://localhost:5000/api/health)
+- API Index: [http://localhost:5000/](http://localhost:5000/)
 
----
+### 2. Frontend (Client)
 
-### 2. Client Setup
-
-In a new terminal, navigate to the `client/` directory:
+In a separate terminal:
 
 ```bash
 cd client
-```
-
-Copy the environment file:
-```bash
-cp .env.example .env
-```
-*(On Windows PowerShell: `Copy-Item .env.example .env`)*
-
-Install frontend dependencies:
-```bash
 npm install
-```
-
-Start the Vite development server:
-```bash
 npm run dev
 ```
 
-Open your browser at `http://localhost:5173`.
+- Customer Store: [http://localhost:5173/](http://localhost:5173/)
+- Admin Portal: [http://localhost:5173/admin/login](http://localhost:5173/admin/login)
 
 ---
 
-## 📋 Available Scripts
+## 🔌 API Endpoints Summary
 
-### In `server/`:
-- `npm start` – Runs the Express server in production mode.
-- `npm run dev` – Runs the Express server with `nodemon` for auto-restart on changes.
+### Authentication (`/api/auth`)
+- `POST /api/auth/register` – Public customer registration (saves role as `customer`)
+- `POST /api/auth/login` – Customer or Admin login (returns JWT token)
+- `GET /api/auth/me` – Authenticated user profile
 
-### In `client/`:
-- `npm run dev` – Starts the local Vite development server with HMR.
-- `npm run build` – Compiles production assets into `client/dist`.
-- `npm run preview` – Locally previews the production build.
+### Categories (`/api/categories`)
+- `GET /api/categories` – Public active categories
+- `GET /api/categories/:id` – Public single category
+- `POST /api/categories` – Protected Admin add category
+- `PUT /api/categories/:id` – Protected Admin edit category
+- `DELETE /api/categories/:id` – Protected Admin delete category (blocks deletion if products are assigned)
+
+### Products (`/api/products`)
+- `GET /api/products` – Public catalog with `?search=...`, `?category=...`, `?sort=...`
+- `GET /api/products/featured` – Public featured products for home page spotlight
+- `GET /api/products/category/:categoryId` – Public products for specific category
+- `GET /api/products/:id` – Public product details
+- `POST /api/products` – Protected Admin add product
+- `PUT /api/products/:id` – Protected Admin edit product
+- `DELETE /api/products/:id` – Protected Admin delete product
+
+### Admin (`/api/admin`)
+- `GET /api/admin/dashboard` – Protected Admin dashboard statistics & recent products
+- `GET /api/admin/products` – Protected Admin full products list with filters
+- `GET /api/admin/categories` – Protected Admin full categories list with product counts
 
 ---
 
-## 📖 Documentation
-
-Detailed documentation is available in the `docs/` folder:
-- [Project Overview](file:///c:/PROJECT/namkeen-mart-app/docs/PROJECT_OVERVIEW.md)
-- [Technology Stack](file:///c:/PROJECT/namkeen-mart-app/docs/TECHNOLOGY_STACK.md)
-- [Folder Structure](file:///c:/PROJECT/namkeen-mart-app/docs/FOLDER_STRUCTURE.md)
-
----
-
-## 📌 Phase Status
+## 📌 Phased Roadmap
 
 - **Phase 1 (Initial Setup)**: Completed ✅
-- **Phase 2 (Authentication & User Roles)**: Pending next phase prompt ⏳
+- **Phase 2 (Home Page, Authentication & Admin Product Management)**: Completed ✅
+- **Phase 3 (Shopping Cart, Checkout, Orders, Payments)**: Pending next phase prompt ⏳
